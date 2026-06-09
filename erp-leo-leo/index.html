@@ -1,0 +1,657 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LEO & LEO LOGISTICA PRO</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/financeiro.css">
+</head>
+<body>
+<div id="toast-container"></div>
+<div id="modal-container"></div>
+
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <a href="#" class="brand">
+      <i class="ti ti-truck-delivery"></i>
+      <div><div>Leo & Leo</div><span class="brand-sub">Transportes — ERP Profissional</span></div>
+    </a>
+  </div>
+  <nav>
+    <div class="nav-section">Operacional</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+    <div class="nav-item" onclick="showPage('fretes',this)"><i class="ti ti-clipboard-list"></i> Gestão de Fretes</div>
+    <div class="nav-item" onclick="showPage('frota',this)"><i class="ti ti-truck"></i> Gestão de Frota</div>
+    <div class="nav-item" onclick="showPage('motoristas',this)"><i class="ti ti-id-badge-2"></i> Motoristas</div>
+    <div class="nav-item" onclick="showPage('manutencao',this)"><i class="ti ti-tools"></i> Manutenção</div>
+    <div class="nav-item" onclick="showPage('combustivel',this)"><i class="ti ti-gas-station"></i> Combustível</div>
+    <div class="nav-item" onclick="showPage('pneus',this)"><i class="ti ti-lifebuoy"></i> Pneus</div>
+    <div class="nav-section">Financeiro</div>
+    <div class="nav-item" onclick="showPage('receber',this)"><i class="ti ti-receipt-2"></i> Contas a Receber</div>
+    <div class="nav-item" onclick="showPage('pagar',this)"><i class="ti ti-file-invoice"></i> Contas a Pagar</div>
+    <div class="nav-item" onclick="showPage('fluxo',this)"><i class="ti ti-chart-arrows-vertical"></i> Fluxo de Caixa</div>
+    <div class="nav-item" onclick="showPage('folha',this)"><i class="ti ti-cash-banknote"></i> Folha Motoristas</div>
+    <div class="nav-item" onclick="showPage('financiamento',this)"><i class="ti ti-credit-card"></i> Financiamentos</div>
+    <div class="nav-item" onclick="showPage('previsao',this)"><i class="ti ti-chart-line"></i> Previsão Financeira</div>
+    <div class="nav-section">Comercial</div>
+    <div class="nav-item" onclick="showPage('clientes',this)"><i class="ti ti-users"></i> Clientes</div>
+    <div class="nav-section">Análises</div>
+    <div class="nav-item" onclick="showPage('rank-clientes',this)"><i class="ti ti-trophy"></i> Ranking Clientes</div>
+    <div class="nav-item" onclick="showPage('rank-rotas',this)"><i class="ti ti-route"></i> Rentab. Rotas</div>
+    <div class="nav-item" onclick="showPage('desempenho-frota',this)"><i class="ti ti-chart-bar"></i> Desempenho Frota</div>
+    <div class="nav-section">Configuração</div>
+    <div class="nav-item" onclick="showPage('custos',this)"><i class="ti ti-calculator"></i> Custos Operacionais</div>
+    <div class="nav-item" onclick="showPage('backup',this)"><i class="ti ti-database-export"></i> Backup / Dados</div>
+    <div class="nav-item" onclick="showPage('agente',this)"><i class="ti ti-robot"></i> Assistente IA</div>
+  </nav>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div><h1 id="page-title">Dashboard Executivo</h1><p id="page-sub">Transportadora Leo & Leo</p></div>
+    <div class="topbar-actions">
+      <div class="exec-stats">
+        <div class="exec-item"><div class="exec-label">Faturamento</div><div class="exec-val" id="top-faturamento">R$ 0,00</div></div>
+        <div class="exec-item"><div class="exec-label">Lucro</div><div class="exec-val" id="top-lucro" style="color:var(--success)">R$ 0,00</div></div>
+        <div class="exec-item"><div class="exec-label">A Receber</div><div class="exec-val" id="top-receber" style="color:var(--warning)">R$ 0,00</div></div>
+      </div>
+      <button class="btn btn-primary" onclick="showPage('fretes',document.querySelector('[onclick*=fretes]'))"><i class="ti ti-plus"></i> Novo Frete</button>
+    </div>
+  </header>
+  <div class="content">
+<!-- DASHBOARD EXECUTIVO -->
+<div id="page-dashboard" class="page active">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Receita Bruta (Mês)</div><div class="stat-value" id="dash-faturamento">R$ 0,00</div><div class="stat-footer" id="dash-faturamento-qtd">0 fretes realizados</div></div>
+    <div class="stat-card"><div class="stat-label">Receita Líquida (Mês)</div><div class="stat-value" id="dash-rec-liq">R$ 0,00</div><div class="stat-footer" id="dash-margem">Margem média: 0%</div></div>
+    <div class="stat-card"><div class="stat-label">Lucro Líquido (Mês)</div><div class="stat-value trend-up" id="dash-lucro">R$ 0,00</div><div class="stat-footer" id="dash-lucro-km">R$ 0,00 / km</div></div>
+    <div class="stat-card"><div class="stat-label">Contas a Receber</div><div class="stat-value" id="dash-receber" style="color:var(--warning)">R$ 0,00</div><div class="stat-footer" id="dash-atrasados">0 faturas pendentes</div></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">KM Rodado (Mês)</div><div class="stat-value" id="dash-km-total">0 km</div><div class="stat-footer" id="dash-vazio">0% km vazio</div></div>
+    <div class="stat-card"><div class="stat-label">Receita / KM</div><div class="stat-value" id="dash-rec-km">R$ 0,00</div><div class="stat-footer">Por km carregado</div></div>
+    <div class="stat-card"><div class="stat-label">Custo / KM</div><div class="stat-value" id="dash-custo-km">R$ 0,00</div><div class="stat-footer">Por km total</div></div>
+    <div class="stat-card"><div class="stat-label">Ticket Médio</div><div class="stat-value" id="dash-ticket">R$ 0,00</div><div class="stat-footer">Por frete</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-chart-line"></i> Faturamento x Lucro</h3></div>
+      <div class="chart-box"><canvas id="chart-faturamento"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-chart-pie"></i> Custos por Categoria</h3></div>
+      <div class="chart-box"><canvas id="chart-custos"></canvas></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-history"></i> Últimos Fretes</h3><button class="btn btn-outline btn-sm" onclick="showPage('fretes',document.querySelector('[onclick*=fretes]'))">Ver todos</button></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Cliente / Rota</th><th>Data</th><th>Líquido</th><th>Status</th></tr></thead><tbody id="tb-recent"></tbody></table></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-trophy"></i> Top Caminhões por Lucro</h3></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Caminhão</th><th>Fretes</th><th>KM Total</th><th>Lucro Total</th></tr></thead><tbody id="tb-rank-caminhao"></tbody></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- GESTÃO DE FRETES -->
+<div id="page-fretes" class="page">
+  <div class="g2">
+    <div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title"><i class="ti ti-plus"></i> Novo Lançamento de Frete</h3></div>
+        <div class="card-body">
+          <div class="g2">
+            <div class="form-group"><label class="form-label">Cliente / Embarcador</label><select id="f-cliente" class="form-control"></select></div>
+            <div class="form-group"><label class="form-label">Motorista</label><select id="f-motorista" class="form-control"></select></div>
+          </div>
+          <div class="g2">
+            <div class="form-group"><label class="form-label">Origem</label><input type="text" id="f-origem" class="form-control" placeholder="Cidade, UF"></div>
+            <div class="form-group"><label class="form-label">Destino</label><input type="text" id="f-destino" class="form-control" placeholder="Cidade, UF"></div>
+          </div>
+          <div class="g3">
+            <div class="form-group"><label class="form-label">KM Carregado</label><input type="number" id="f-km" class="form-control" oninput="previewFrete()"></div>
+            <div class="form-group"><label class="form-label">KM Vazio Coleta</label><input type="number" id="f-vazio-coleta" class="form-control" value="0" oninput="previewFrete()"></div>
+            <div class="form-group"><label class="form-label">KM Vazio Descarga</label><input type="number" id="f-vazio-descarga" class="form-control" value="0" oninput="previewFrete()"></div>
+          </div>
+          <div class="g3">
+            <div class="form-group"><label class="form-label">Valor Bruto (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="number" id="f-valor" class="form-control input-with-prefix" oninput="previewFrete()"></div></div>
+            <div class="form-group"><label class="form-label">Pedágio (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="number" id="f-ped" class="form-control input-with-prefix" value="0" oninput="previewFrete()"></div></div>
+            <div class="form-group"><label class="form-label">Comissão Agenc. (%)</label><input type="number" id="f-comissao-pct" class="form-control" value="0" oninput="previewFrete()"></div>
+          </div>
+          <div class="g2">
+            <div class="form-group"><label class="form-label">Caminhão</label><select id="f-caminhao" class="form-control" onchange="previewFrete()"></select></div>
+            <div class="form-group"><label class="form-label">Status Recebimento</label><select id="f-status-receb" class="form-control"><option value="Pendente">Pendente</option><option value="Faturado">Faturado</option><option value="Recebido">Recebido</option><option value="Atrasado">Atrasado</option></select></div>
+          </div>
+          <div class="g2">
+            <div class="form-group"><label class="form-label">Data Emissão</label><input type="date" id="f-data-emissao" class="form-control"></div>
+            <div class="form-group"><label class="form-label">Data Vencimento</label><input type="date" id="f-data-venc" class="form-control"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Número NF</label><input type="text" id="f-nf" class="form-control" placeholder="Opcional"></div>
+          <div id="f-preview" style="display:none" class="alert alert-info"></div>
+          <div id="f-indicadores" style="display:none">
+            <div class="frete-ind">
+              <div class="frete-ind-item"><div class="frete-ind-label">Receita/KM</div><div class="frete-ind-val" id="fi-rec-km">-</div></div>
+              <div class="frete-ind-item"><div class="frete-ind-label">Custo/KM</div><div class="frete-ind-val" id="fi-custo-km">-</div></div>
+              <div class="frete-ind-item"><div class="frete-ind-label">Lucro/KM</div><div class="frete-ind-val" id="fi-lucro-km">-</div></div>
+              <div class="frete-ind-item"><div class="frete-ind-label">Margem %</div><div class="frete-ind-val" id="fi-margem">-</div></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:.5rem">
+            <button class="btn btn-primary" onclick="salvarFrete()"><i class="ti ti-device-floppy"></i> Salvar Frete</button>
+            <button class="btn btn-outline" onclick="limparFrete()"><i class="ti ti-x"></i> Limpar</button>
+          </div>
+          <input type="hidden" id="f-edit-id" value="">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-history"></i> Histórico de Operações</h3>
+        <div style="display:flex;gap:8px">
+          <select id="filtro-status-frete" class="form-control" style="width:130px;font-size:.78rem" onchange="renderFretes()">
+            <option value="">Todos status</option>
+            <option value="Pendente">Pendente</option>
+            <option value="Faturado">Faturado</option>
+            <option value="Recebido">Recebido</option>
+            <option value="Atrasado">Atrasado</option>
+          </select>
+        </div>
+      </div>
+      <div id="fretes-lista" style="overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- GESTÃO DE FROTA -->
+<div id="page-frota" class="page">
+  <div class="g2">
+    <div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title"><i class="ti ti-plus"></i> Adicionar Veículo</h3></div>
+        <div class="card-body">
+          <div class="form-group"><label class="form-label">Placa</label><input type="text" id="cam-placa" class="form-control" placeholder="ABC-1234"></div>
+          <div class="form-group"><label class="form-label">Modelo</label><input type="text" id="cam-modelo" class="form-control" placeholder="Ex: Scania R450"></div>
+          <div class="g2">
+            <div class="form-group"><label class="form-label">Ano</label><input type="number" id="cam-ano" class="form-control" placeholder="2022"></div>
+            <div class="form-group"><label class="form-label">Capacidade (ton)</label><input type="number" id="cam-capacidade" class="form-control" placeholder="30"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Motorista Padrão</label><select id="cam-motorista" class="form-control"><option value="">-- Nenhum --</option></select></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="salvarCaminhao()"><i class="ti ti-check"></i> Salvar Veículo</button>
+            <button class="btn btn-outline" onclick="limparCaminhao()"><i class="ti ti-x"></i> Limpar</button>
+          </div>
+          <input type="hidden" id="cam-edit-id" value="">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-truck"></i> Veículos Cadastrados</h3></div>
+      <div id="caminhoes-lista" style="overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MOTORISTAS -->
+<div id="page-motoristas" class="page">
+  <div class="g2">
+    <div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title"><i class="ti ti-plus"></i> Cadastrar Motorista</h3></div>
+        <div class="card-body">
+          <div class="form-group"><label class="form-label">Nome Completo</label><input type="text" id="mot-nome" class="form-control"></div>
+          <div class="g2">
+            <div class="form-group"><label class="form-label">CPF</label><input type="text" id="mot-cpf" class="form-control" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
+            <div class="form-group"><label class="form-label">Telefone</label><input type="text" id="mot-tel" class="form-control" placeholder="(00) 00000-0000" maxlength="15" oninput="maskTel(this)"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Tipo de Contratação</label>
+            <select id="mot-tipo" class="form-control" onchange="toggleMotoristaForm()">
+              <option value="fixo">Salário Fixo</option>
+              <option value="comissao">Comissão por Frete</option>
+              <option value="misto">Misto (Salário + Comissão)</option>
+            </select>
+          </div>
+          <div id="mot-salario-div" class="form-group"><label class="form-label">Salário Mensal (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="number" id="mot-salario" class="form-control input-with-prefix" value="0"></div></div>
+          <div id="mot-comissao-div" class="form-group" style="display:none"><label class="form-label">Comissão (%)</label><input type="number" id="mot-comissao" class="form-control" value="0"></div>
+          <div class="g3">
+            <div class="form-group"><label class="form-label">Valor por Viagem (R$)</label><input type="number" id="mot-regra-viagem" class="form-control" value="0"></div>
+            <div class="form-group"><label class="form-label">Valor por KM (R$)</label><input type="number" id="mot-regra-km" class="form-control" value="0"></div>
+            <div class="form-group"><label class="form-label">% sobre Lucro</label><input type="number" id="mot-regra-lucro" class="form-control" value="0"></div>
+          </div>
+          <div class="g2">
+            <div class="form-group"><label class="form-label">Data de Admissão</label><input type="date" id="mot-admissao" class="form-control"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Observações</label><textarea id="mot-obs" class="form-control" rows="2" placeholder="Opcional"></textarea></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="salvarMotorista()"><i class="ti ti-device-floppy"></i> Salvar</button>
+            <button class="btn btn-outline" onclick="limparMotorista()"><i class="ti ti-x"></i> Limpar</button>
+          </div>
+          <input type="hidden" id="mot-edit-id" value="">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-id-badge-2"></i> Equipe de Motoristas</h3>
+        <label style="display:flex;align-items:center;gap:6px;font-size:.8rem;cursor:pointer"><input type="checkbox" id="mot-show-inativos" onchange="renderMotoristas()"> Mostrar inativos</label>
+      </div>
+      <div id="motoristas-lista" style="overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MANUTENÇÃO -->
+<div id="page-manutencao" class="page">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Gasto (Mês)</div><div class="stat-value" id="man-total-mes">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Total Acumulado</div><div class="stat-value" id="man-total-geral">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Custo por KM</div><div class="stat-value" id="man-custo-km">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Eventos este Mês</div><div class="stat-value" id="man-qtd-mes">0</div></div>
+  </div>
+  <div class="g2">
+    <div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title"><i class="ti ti-plus"></i> Registro de Manutenção</h3></div>
+        <div class="card-body">
+          <div class="form-group"><label class="form-label">Veículo</label><select id="man-caminhao" class="form-control"></select></div>
+          <div class="form-group"><label class="form-label">Tipo de Serviço</label><select id="man-tipo" class="form-control"><option>Troca de Óleo</option><option>Pneus</option><option>Mecânica</option><option>Elétrica</option><option>Revisão</option><option>Funilaria</option><option>Outros</option></select></div>
+          <div class="g2">
+            <div class="form-group"><label class="form-label">Data</label><input type="date" id="man-data" class="form-control"></div>
+            <div class="form-group"><label class="form-label">KM Atual</label><input type="number" id="man-km" class="form-control"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Valor (R$)</label><div class="input-group"><span class="input-prefix">R$</span><input type="number" id="man-valor" class="form-control input-with-prefix"></div></div>
+          <div class="form-group"><label class="form-label">Descrição</label><input type="text" id="man-desc" class="form-control" placeholder="Detalhes do serviço"></div>
+          <button class="btn btn-primary" onclick="salvarManutencao()"><i class="ti ti-check"></i> Registrar</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-history"></i> Histórico de Serviços</h3></div>
+      <div id="manutencao-lista" style="overflow-x:auto"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="ti ti-chart-bar"></i> Custo por Veículo</h3></div>
+    <div id="man-por-caminhao" style="overflow-x:auto"></div>
+  </div>
+</div>
+
+<!-- CONTAS A RECEBER -->
+<div id="page-receber" class="page">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Pendente</div><div class="stat-value" id="rec-total-pendente">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Total Recebido (Mês)</div><div class="stat-value" id="rec-total-recebido" style="color:var(--success)">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Total Atrasado</div><div class="stat-value" id="rec-total-atrasado" style="color:var(--danger)">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Projeção 30 dias</div><div class="stat-value" id="rec-projecao">R$ 0,00</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="ti ti-receipt-2"></i> Fluxo de Recebimentos</h3>
+      <select id="filtro-rec" class="form-control" style="width:130px;font-size:.78rem" onchange="renderReceber()">
+        <option value="">Todos</option><option value="Pendente">Pendente</option><option value="Faturado">Faturado</option><option value="Atrasado">Atrasado</option><option value="Recebido">Recebido</option>
+      </select>
+    </div>
+    <div style="overflow-x:auto"><table><thead><tr><th>Cliente</th><th>NF</th><th>Vencimento</th><th>Valor Bruto</th><th>Forma Pagto</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tb-recebimentos"></tbody></table></div>
+  </div>
+</div>
+
+<!-- CONTAS A PAGAR -->
+<div id="page-pagar" class="page">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total em Aberto</div><div class="stat-value" id="pag-total-aberto">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Pago no Mês</div><div class="stat-value" id="pag-total-pago" style="color:var(--success)">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Vencidas</div><div class="stat-value" id="pag-total-vencido" style="color:var(--danger)">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Próximos 7 dias</div><div class="stat-value" id="pag-prox-7">R$ 0,00</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-plus"></i> Nova Conta a Pagar</h3></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">Descrição</label><input type="text" id="pag-desc" class="form-control" placeholder="Ex: Oficina, imposto, seguro"></div>
+        <div class="g2">
+          <div class="form-group"><label class="form-label">Categoria</label><select id="pag-categoria" class="form-control"><option>Combustível</option><option>Pedágios</option><option>Salários</option><option>Manutenção</option><option>Pneus</option><option>Impostos</option><option>Financiamento</option><option>Seguro</option><option>Outros</option></select></div>
+          <div class="form-group"><label class="form-label">Veículo</label><select id="pag-caminhao" class="form-control"><option value="">-- Geral --</option></select></div>
+        </div>
+        <div class="g3">
+          <div class="form-group"><label class="form-label">Vencimento</label><input type="date" id="pag-venc" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Valor (R$)</label><input type="number" id="pag-valor" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Status</label><select id="pag-status" class="form-control"><option>Pendente</option><option>Pago</option><option>Vencido</option></select></div>
+        </div>
+        <div class="form-group"><label class="form-label">Observações</label><input type="text" id="pag-obs" class="form-control"></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="salvarContaPagar()"><i class="ti ti-device-floppy"></i> Salvar Conta</button>
+          <button class="btn btn-outline" onclick="limparContaPagar()"><i class="ti ti-x"></i> Limpar</button>
+        </div>
+        <input type="hidden" id="pag-edit-id" value="">
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="ti ti-file-invoice"></i> Despesas</h3>
+        <select id="filtro-pagar" class="form-control" style="width:140px;font-size:.78rem" onchange="renderContasPagar()">
+          <option value="">Todas</option><option>Pendente</option><option>Pago</option><option>Vencido</option>
+        </select>
+      </div>
+      <div id="pagar-lista" style="overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOLHA MOTORISTAS -->
+<div id="page-folha" class="page">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Folha Prevista</div><div class="stat-value" id="folha-prevista">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Pago no Mês</div><div class="stat-value" id="folha-pago" style="color:var(--success)">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">A Pagar</div><div class="stat-value" id="folha-aberto" style="color:var(--warning)">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Motoristas Ativos</div><div class="stat-value" id="folha-ativos">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><i class="ti ti-cash-banknote"></i> Apuração Mensal de Motoristas</h3>
+      <div style="display:flex;gap:8px">
+        <select id="folha-mes" class="form-control" style="width:130px;font-size:.78rem" onchange="renderFolhaMotoristas()"></select>
+        <select id="folha-ano" class="form-control" style="width:95px;font-size:.78rem" onchange="renderFolhaMotoristas()"></select>
+      </div>
+    </div>
+    <div id="folha-lista" style="overflow-x:auto"></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="ti ti-history"></i> Histórico de Pagamentos</h3></div>
+    <div id="folha-historico" style="overflow-x:auto"></div>
+  </div>
+</div>
+
+<!-- FLUXO DE CAIXA -->
+<div id="page-fluxo" class="page">
+  <div class="g3">
+    <div class="stat-card" style="background:#f0fdf4"><div class="stat-label">Entradas (Recebidas)</div><div class="stat-value" id="fluxo-entradas">R$ 0,00</div></div>
+    <div class="stat-card" style="background:#fef2f2"><div class="stat-label">Saídas Totais</div><div class="stat-value" id="fluxo-saidas">R$ 0,00</div></div>
+    <div class="stat-card" style="background:#eff6ff"><div class="stat-label">Saldo Operacional</div><div class="stat-value" id="fluxo-saldo">R$ 0,00</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-arrow-up-circle"></i> Entradas Detalhadas</h3></div>
+      <div id="fluxo-entradas-det"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-arrow-down-circle"></i> Saídas Detalhadas</h3></div>
+      <div id="fluxo-saidas-det"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="ti ti-chart-bar"></i> DRE — Demonstrativo de Resultados</h3>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="dre-mes" class="form-control" style="width:130px;font-size:.78rem" onchange="renderDREPage()"></select>
+        <select id="dre-ano" class="form-control" style="width:90px;font-size:.78rem" onchange="renderDREPage()"></select>
+      </div>
+    </div>
+    <div class="card-body">
+      <div id="dre-container"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PREVISÃO FINANCEIRA -->
+<div id="page-previsao" class="page">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Saldo Projetado (30 dias)</div><div class="stat-value" id="proj-30">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Saldo Projetado (60 dias)</div><div class="stat-value" id="proj-60">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Saldo Projetado (90 dias)</div><div class="stat-value" id="proj-90">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Ponto de Equilíbrio</div><div class="stat-value" id="proj-breakeven">0 km</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="ti ti-chart-line"></i> Análise de Fluxo Futuro</h3></div>
+    <div class="card-body"><div id="previsao-detalhe"></div></div>
+  </div>
+</div>
+
+<!-- FINANCIAMENTOS -->
+<div id="page-financiamento" class="page">
+  <div class="g2">
+    <div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title"><i class="ti ti-plus"></i> Novo Financiamento</h3></div>
+        <div class="card-body">
+          <div class="form-group"><label class="form-label">Descrição do Bem</label><input type="text" id="fin-desc" class="form-control" placeholder="Ex: Scania R450"></div>
+          <div class="form-group"><label class="form-label">Caminhão Vinculado</label><select id="fin-caminhao" class="form-control"><option value="">-- Geral (rateado) --</option></select></div>
+          <div class="g2">
+            <div class="form-group"><label class="form-label">Valor Parcela (R$)</label><input type="number" id="fin-parcela" class="form-control"></div>
+            <div class="form-group"><label class="form-label">Qtd Parcelas</label><input type="number" id="fin-qtd" class="form-control"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Parcelas Pagas</label><input type="number" id="fin-pagas" class="form-control"></div>
+          <button class="btn btn-primary" onclick="salvarFinanciamento()"><i class="ti ti-check"></i> Salvar</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-credit-card"></i> Parcelamentos Ativos</h3></div>
+      <div id="fin-lista" style="overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENTES -->
+<!-- COMBUSTIVEL -->
+<div id="page-combustivel" class="page">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Gasto Total</div><div class="stat-value" id="comb-total">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Litros</div><div class="stat-value" id="comb-litros">0 L</div></div>
+    <div class="stat-card"><div class="stat-label">Preco Medio</div><div class="stat-value" id="comb-preco-medio">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Custo / KM</div><div class="stat-value" id="comb-custo-km">R$ 0,00</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-gas-station"></i> Registrar Abastecimento</h3></div>
+      <div class="card-body">
+        <div class="g2">
+          <div class="form-group"><label class="form-label">Data</label><input type="date" id="comb-data" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Veiculo</label><select id="comb-caminhao" class="form-control"></select></div>
+        </div>
+        <div class="g3">
+          <div class="form-group"><label class="form-label">Litros</label><input type="number" id="comb-litros-input" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Valor Total (R$)</label><input type="number" id="comb-valor" class="form-control"></div>
+          <div class="form-group"><label class="form-label">KM Atual</label><input type="number" id="comb-km" class="form-control"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Posto</label><input type="text" id="comb-posto" class="form-control"></div>
+        <button class="btn btn-primary" onclick="salvarCombustivel()"><i class="ti ti-check"></i> Registrar</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-alert-triangle"></i> Alertas de Consumo</h3></div>
+      <div class="card-body" id="comb-alertas"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="ti ti-list"></i> Historico de Abastecimentos</h3></div>
+    <div id="comb-lista" style="overflow-x:auto"></div>
+  </div>
+</div>
+
+<!-- PNEUS -->
+<div id="page-pneus" class="page">
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Custo Total</div><div class="stat-value" id="pneu-total">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Eventos</div><div class="stat-value" id="pneu-eventos">0</div></div>
+    <div class="stat-card"><div class="stat-label">Custo / KM</div><div class="stat-value" id="pneu-custo-km">R$ 0,00</div></div>
+    <div class="stat-card"><div class="stat-label">Vida Media</div><div class="stat-value" id="pneu-vida">0 km</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-lifebuoy"></i> Controle de Pneus</h3></div>
+      <div class="card-body">
+        <div class="g2">
+          <div class="form-group"><label class="form-label">Data</label><input type="date" id="pneu-data" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Veiculo</label><select id="pneu-caminhao" class="form-control"></select></div>
+        </div>
+        <div class="g3">
+          <div class="form-group"><label class="form-label">Evento</label><select id="pneu-tipo" class="form-control"><option>Compra</option><option>Instalacao</option><option>Rodizio</option><option>Reforma</option><option>Descarte</option></select></div>
+          <div class="form-group"><label class="form-label">Valor (R$)</label><input type="number" id="pneu-valor" class="form-control"></div>
+          <div class="form-group"><label class="form-label">KM Atual</label><input type="number" id="pneu-km" class="form-control"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Descricao</label><input type="text" id="pneu-desc" class="form-control"></div>
+        <button class="btn btn-primary" onclick="salvarPneu()"><i class="ti ti-check"></i> Registrar</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-chart-bar"></i> Custo por Veiculo</h3></div>
+      <div id="pneu-por-caminhao" style="overflow-x:auto"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="ti ti-list"></i> Historico de Pneus</h3></div>
+    <div id="pneu-lista" style="overflow-x:auto"></div>
+  </div>
+</div>
+
+<div id="page-clientes" class="page">
+  <div class="g2">
+    <div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title"><i class="ti ti-plus"></i> Novo Cliente</h3></div>
+        <div class="card-body">
+          <div class="form-group"><label class="form-label">Nome Fantasia</label><input type="text" id="cli-nome" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Razão Social</label><input type="text" id="cli-empresa" class="form-control"></div>
+          <div class="form-group"><label class="form-label">Telefone</label><input type="text" id="cli-tel" class="form-control" placeholder="(00) 00000-0000" maxlength="15" oninput="maskTel(this)"></div>
+          <div class="g2">
+            <div class="form-group"><label class="form-label">Cidade</label><input type="text" id="cli-cidade" class="form-control"></div>
+            <div class="form-group"><label class="form-label">Estado</label><input type="text" id="cli-estado" class="form-control" placeholder="UF"></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="salvarCliente()"><i class="ti ti-check"></i> Cadastrar</button>
+            <button class="btn btn-outline" onclick="limparCliente()"><i class="ti ti-x"></i> Limpar</button>
+          </div>
+          <input type="hidden" id="cli-edit-id" value="">
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-users"></i> Carteira de Clientes</h3>
+        <label style="display:flex;align-items:center;gap:6px;font-size:.8rem;cursor:pointer"><input type="checkbox" id="cli-show-inativos" onchange="renderClientes()"> Mostrar inativos</label>
+      </div>
+      <div id="clientes-lista" style="overflow-x:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RANKING CLIENTES -->
+<div id="page-rank-clientes" class="page">
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="ti ti-trophy"></i> Top Clientes por Receita e Lucro</h3></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Cliente</th><th>Fretes</th><th>Receita Total</th><th>Lucro Total</th><th>Margem</th><th>Ticket Médio</th></tr></thead><tbody id="tb-rank-clientes"></tbody></table></div>
+  </div>
+</div>
+
+<!-- RANKING ROTAS -->
+<div id="page-rank-rotas" class="page">
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="ti ti-route"></i> Rentabilidade de Rotas</h3></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Origem → Destino</th><th>Viagens</th><th>KM Total</th><th>Receita Total</th><th>Lucro Total</th><th>Lucro Médio</th><th>R$/KM</th></tr></thead><tbody id="tb-rank-rotas"></tbody></table></div>
+  </div>
+</div>
+
+<!-- DESEMPENHO FROTA -->
+<div id="page-desempenho-frota" class="page">
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="ti ti-chart-bar"></i> Desempenho Individual por Veículo</h3></div>
+    <div style="overflow-x:auto"><table><thead><tr><th>Veículo</th><th>Motorista</th><th>Fretes</th><th>KM Rodados</th><th>Receita</th><th>Custo Oper.</th><th>Manutenção</th><th>Financiamento</th><th>Lucro</th><th>Lucro/KM</th></tr></thead><tbody id="tb-desempenho-frota"></tbody></table></div>
+  </div>
+</div>
+
+<!-- CUSTOS OPERACIONAIS -->
+<div id="page-custos" class="page">
+  <div class="card">
+    <div class="card-header"><h3 class="card-title"><i class="ti ti-settings-automation"></i> Configurações de Custos Reais</h3></div>
+    <div class="card-body">
+      <div class="g2">
+        <div>
+          <h4 style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">VARIÁVEIS POR KM</h4>
+          <div class="form-group"><label class="form-label">Diesel (R$/litro)</label><input type="number" step="0.01" id="c-diesel" class="form-control" onchange="calcCustos()"></div>
+          <div class="form-group"><label class="form-label">Média (km/litro)</label><input type="number" step="0.1" id="c-media" class="form-control" onchange="calcCustos()"></div>
+          <div class="form-group"><label class="form-label">Arla/Fluidos (R$/km)</label><input type="number" step="0.01" id="c-arla" class="form-control" onchange="calcCustos()"></div>
+          <div class="form-group"><label class="form-label">Manutenção/Pneus (R$/km)</label><input type="number" step="0.01" id="c-manut" class="form-control" onchange="calcCustos()"></div>
+          <div class="form-group"><label class="form-label">Impostos sobre Frete (%)</label><input type="number" step="0.1" id="c-impostos" class="form-control" onchange="calcCustos()"></div>
+        </div>
+        <div>
+          <h4 style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">OUTROS CUSTOS FIXOS</h4>
+          <div class="form-group"><label class="form-label">KM Estimado Mês</label><input type="number" id="c-km-mes" class="form-control" onchange="calcCustos()"></div>
+          <div id="fixed-costs-list"></div>
+          <button class="btn btn-outline btn-sm" onclick="addFixedCost()"><i class="ti ti-plus"></i> Novo Custo Fixo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BACKUP / DADOS -->
+<div id="page-backup" class="page">
+  <div class="g2">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-database-export"></i> Exportar Dados</h3></div>
+      <div class="card-body">
+        <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">Faça backup completo de todos os dados do sistema.</p>
+        <div style="display:flex;flex-direction:column;gap:.75rem">
+          <button class="btn btn-primary" onclick="exportarBackupJSON()"><i class="ti ti-download"></i> Backup Completo (JSON)</button>
+          <button class="btn btn-outline" onclick="exportarRelatorio('fretes')"><i class="ti ti-file-spreadsheet"></i> Exportar Fretes (CSV)</button>
+          <button class="btn btn-outline" onclick="exportarRelatorio('clientes')"><i class="ti ti-file-spreadsheet"></i> Exportar Clientes (CSV)</button>
+          <button class="btn btn-outline" onclick="exportarRelatorio('manutencoes')"><i class="ti ti-file-spreadsheet"></i> Exportar Manutenções (CSV)</button>
+          <button class="btn btn-outline" onclick="exportarRelatorio('motoristas')"><i class="ti ti-file-spreadsheet"></i> Exportar Motoristas (CSV)</button>
+          <button class="btn btn-outline" onclick="exportarRelatorio('contas_pagar')"><i class="ti ti-file-spreadsheet"></i> Exportar Contas a Pagar (CSV)</button>
+          <button class="btn btn-outline" onclick="exportarRelatorio('folha')"><i class="ti ti-file-spreadsheet"></i> Exportar Folha (CSV)</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 class="card-title"><i class="ti ti-database-import"></i> Importar / Restaurar</h3></div>
+      <div class="card-body">
+        <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">Restaure um backup JSON anteriormente exportado.</p>
+        <div class="alert alert-warning"><i class="ti ti-alert-triangle"></i> Importar irá <strong>substituir todos os dados atuais</strong>. Faça um backup antes.</div>
+        <div class="form-group"><label class="form-label">Selecionar arquivo de Backup</label><input type="file" id="backup-file" class="form-control" accept=".json"></div>
+        <button class="btn btn-danger" onclick="importarBackup()"><i class="ti ti-upload"></i> Restaurar Backup</button>
+        <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+          <p style="font-size:.85rem;color:var(--muted);margin-bottom:.75rem">Limpar todos os dados do sistema:</p>
+          <button class="btn btn-danger" onclick="limparTodosDados()"><i class="ti ti-trash"></i> Resetar Sistema</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ASSISTENTE IA -->
+<div id="page-agente" class="page">
+  <div class="card" style="height:600px;display:flex;flex-direction:column">
+    <div class="card-header"><h3 class="card-title"><i class="ti ti-robot"></i> Auditoria e Consultoria IA — Dados Reais</h3></div>
+    <div class="card-body" style="flex:1;overflow-y:auto;background:#f8fafc" id="chat-msgs"></div>
+    <div style="padding:.75rem 1.5rem;border-top:1px solid var(--border)">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.6rem">
+        <button class="btn btn-outline btn-sm" onclick="askIA('Qual meu melhor cliente?')">Melhor cliente</button>
+        <button class="btn btn-outline btn-sm" onclick="askIA('Qual meu caminhão mais lucrativo?')">Caminhão lucrativo</button>
+        <button class="btn btn-outline btn-sm" onclick="askIA('Qual rota gera mais lucro?')">Melhor rota</button>
+        <button class="btn btn-outline btn-sm" onclick="askIA('Qual minha margem média?')">Margem média</button>
+        <button class="btn btn-outline btn-sm" onclick="askIA('Quanto tenho a receber?')">A receber</button>
+        <button class="btn btn-outline btn-sm" onclick="askIA('Quanto tenho a pagar?')">A pagar</button>
+        <button class="btn btn-outline btn-sm" onclick="askIA('Como esta a folha dos motoristas?')">Folha</button>
+        <button class="btn btn-outline btn-sm" onclick="askIA('Qual meu custo médio por KM?')">Custo/KM</button>
+        <button class="btn btn-outline btn-sm" onclick="askIA('Qual caminhão gera mais manutenção?')">Manutenção</button>
+      </div>
+      <div style="display:flex;gap:10px">
+        <input type="text" id="chat-input" class="form-control" placeholder="Pergunte sobre rentabilidade, custos, rotas..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="btn btn-primary" onclick="sendMsg()"><i class="ti ti-send"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+</main>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>
+
+

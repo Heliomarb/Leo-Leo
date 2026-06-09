@@ -1,0 +1,8 @@
+﻿.frete-ind-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1rem}
+.frete-ind-item{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:.8rem}
+.frete-ind-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;font-weight:700}
+.frete-ind-val{font-size:1rem;font-weight:800;margin-top:.25rem}
+.chart-box{height:280px;padding:1rem;position:relative}
+@media (max-width:1100px){.stats-grid,.stats-grid-5,.g4{grid-template-columns:repeat(2,1fr)}.g2,.g3{grid-template-columns:1fr}.exec-stats{display:none}}
+@media (max-width:720px){.app{display:block;height:auto}.sidebar{width:100%;height:auto}.main{overflow:visible}.topbar{position:static;align-items:flex-start;gap:1rem}.content{padding:1rem}.stats-grid,.stats-grid-5{grid-template-columns:1fr}.frete-ind-grid{grid-template-columns:1fr 1fr}}
+
